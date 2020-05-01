@@ -1,0 +1,9 @@
+[package]
+name = "example"
+version = "0.1.0"
+authors = ["vms <michail.vms@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+wasmer-runtime = {git = "http://github.com/fluencelabs/wasmer"}
+wasmer-runtime-core = {git = "http://github.com/fluencelabs/wasmer"}

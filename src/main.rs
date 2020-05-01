@@ -1,3 +1,4 @@
+use std::ops::{Deref, DerefMut};
 use std::pin::Pin;
 use wasmer_runtime::{compile, Func, ImportObject, Instance};
 
@@ -19,9 +20,16 @@ impl T<'_> {
             instance,
             func: None,
         });
-        let func = Some(res.as_ref().instance.exports.get::<Func<'_, i32, i32>>("ads").unwrap());
-        let mut_ref = Pin::as_mut(&mut res);
-        Pin::get_mut(mut_ref).func = func;
+        unsafe {
+            //let mut_ref = Pin::as_mut(&mut res);
+            Pin::get_unchecked_mut(res.as_mut()).func = Some(
+                res.deref()
+                    .instance
+                    .exports
+                    .get::<Func<'_, i32, i32>>("asd")
+                    .unwrap(),
+            );
+        }
         //res.as_mut().func = func;
 
         res

@@ -1,6 +1,5 @@
 use std::mem;
 use std::ops::Deref;
-use std::pin::Pin;
 use wasmer_runtime::{compile, Func, ImportObject, Instance};
 
 struct T {
@@ -9,14 +8,14 @@ struct T {
 }
 
 impl T {
-    pub fn new() -> Pin<Box<Self>> {
+    pub fn new() -> Box<Self> {
         let import_object = ImportObject::new();
         let wasm_bytes = vec![];
         let instance = compile(&wasm_bytes)
             .unwrap()
             .instantiate(&import_object)
             .unwrap();
-        let mut res = Box::pin(Self {
+        let mut res = Box::new(Self {
             instance,
             func: None,
         });
@@ -29,7 +28,7 @@ impl T {
                 .get::<Func<'_, i32, i32>>("asd")
                 .unwrap();
             let static_func = mem::transmute::<Func<'_, i32, i32>, Func<'static, i32, i32>>(func);
-            Pin::get_unchecked_mut(res.as_mut()).func = Some(static_func);
+            res.as_mut().func = Some(static_func);
         }
         //res.as_mut().func = func;
 

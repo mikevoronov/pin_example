@@ -4,35 +4,26 @@ use wasmer_runtime::{compile, Func, ImportObject, Instance};
 
 struct T {
     instance: Instance,
-    func: Option<Func<'static, i32, i32>>,
+    func: Func<'static, i32, i32>,
 }
 
 impl T {
-    pub fn new() -> Box<Self> {
+    pub fn new() -> Self {
         let import_object = ImportObject::new();
         let wasm_bytes = vec![];
         let instance = compile(&wasm_bytes)
             .unwrap()
             .instantiate(&import_object)
             .unwrap();
-        let mut res = Box::new(Self {
-            instance,
-            func: None,
-        });
 
         unsafe {
-            let func = res
-                .deref()
-                .instance
-                .exports
-                .get::<Func<'_, i32, i32>>("asd")
-                .unwrap();
-            let static_func = mem::transmute::<Func<'_, i32, i32>, Func<'static, i32, i32>>(func);
-            res.as_mut().func = Some(static_func);
+            let func = instance.exports.get::<Func<'_, i32, i32>>("asd").unwrap();
+            let func = mem::transmute::<Func<'_, i32, i32>, Func<'static, i32, i32>>(func);
+            Self {
+                instance,
+                func
+            }
         }
-        //res.as_mut().func = func;
-
-        res
     }
 }
 
